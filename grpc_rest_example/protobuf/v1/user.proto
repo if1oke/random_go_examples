@@ -1,0 +1,23 @@
+syntax = "proto3";
+package v1;
+
+option go_package = "grpc_rest_example/pkg/api/grpc/v1";
+
+service UserService {
+  rpc Get(GetRequest) returns (GetResponse);
+  rpc Create(CreateRequest) returns (Empty);
+};
+
+message GetRequest {
+  int32 id = 1;
+};
+
+message GetResponse {
+  string username = 1;
+};
+
+message CreateRequest {
+  string username = 1;
+};
+
+message Empty {};
