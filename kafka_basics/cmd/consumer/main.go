@@ -1,28 +1,46 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"kafka-basics/internal/infrastructure/kafka"
-	"kafka-basics/internal/usecase"
-	"log"
+	"kafka-basics/internal/app"
+	"kafka-basics/internal/domain"
+	"os"
+	"os/signal"
+	"sync"
 )
 
 func main() {
-	consumer := kafka.NewConsumer(
-		"192.168.100.191:9092",
-		"base_g1",
-		"demo-test",
-	)
-	defer consumer.Reader.Close()
+	ctx, cancel := context.WithCancel(context.Background())
+	wg := &sync.WaitGroup{}
 
-	useCase := usecase.NewMessageConsumerUseCase(consumer)
+	signalChan := make(chan os.Signal, 1)
+	messages := make(chan domain.Message)
+	done := make(chan struct{})
 
-	for {
-		m, err := useCase.Read()
-		if err != nil {
-			log.Printf("Error reading message: %v\n", err)
-			continue
-		}
-		fmt.Printf("📥 Received:  %+v\n", m)
-	}
+	signal.Notify(signalChan, os.Interrupt)
+
+	go func() {
+		<-signalChan
+		fmt.Println("Received an interrupt, shutting down...")
+		cancel()
+	}()
+
+	consumer1 := app.NewConsumerApp(ctx, wg, messages, "consumer1")
+	consumer2 := app.NewConsumerApp(ctx, wg, messages, "consumer2")
+	logger := app.NewLoggerApp(ctx, wg, messages)
+
+	wg.Add(3)
+
+	go consumer1.Run()
+	go consumer2.Run()
+	go logger.Run()
+
+	go func() {
+		wg.Wait()
+		close(messages)
+		close(done)
+	}()
+
+	<-done
 }

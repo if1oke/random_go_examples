@@ -15,8 +15,8 @@ func NewMessageConsumerUseCase(consumer domain.IConsumer) *MessageConsumerUseCas
 	}
 }
 
-func (u *MessageConsumerUseCase) Read() (domain.Message, error) {
-	m, err := u.consumer.ReadMessage(context.Background())
+func (u *MessageConsumerUseCase) Read(ctx context.Context) (domain.Message, error) {
+	m, err := u.consumer.ReadMessage(ctx)
 	if err != nil {
 		return domain.Message{}, err
 	}
