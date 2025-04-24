@@ -3,7 +3,7 @@ package user
 import (
 	"context"
 	"mongo_ca/internal/domain/entity/user"
-	repo "mongo_ca/internal/infrastructure/repositories/mongodb/user"
+	repo "mongo_ca/internal/repository/mongodb/user"
 )
 
 type UseCases struct {

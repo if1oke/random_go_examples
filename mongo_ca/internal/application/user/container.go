@@ -3,7 +3,7 @@ package user
 import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
-	"mongo_ca/internal/infrastructure/repositories/mongodb/user"
+	"mongo_ca/internal/repository/mongodb/user"
 )
 
 type Application struct {
